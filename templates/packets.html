@@ -40,9 +40,10 @@
                     <!-- Modal body -->
                     <div class="p-4 md:p-5 space-y-4 flex flex-col">
                         <div class="mb-8 text-center">
-                            <span class="text-2xl">Anda Memilih paket <span class="text-blue-500">3 Jam</span> dengan
+                            <span class="text-2xl">Anda Memilih paket <span class="text-blue-500"
+                                    id="packet-name"></span> dengan
                                 Harga
-                                <span class="text-blue-500">Rp5000</span></span>
+                                <span id="packet-price" class="text-blue-500"></span></span>
                         </div>
                         <label for="">Masukan Nomor telp</label>
                         <input placeholder="Nomor Wa / Telp" required id="phone-field" type="text"
@@ -70,7 +71,9 @@
             <div class="flex flex-row flex-wrap ">
                 <%for i in packets {%>
                 <div class="flex flex-col p-2 w-3/12">
-                    <button data-modal-target="default-modal" data-modal-toggle="default-modal"
+                    <button
+                        onclick="choosePacket(<%= i.id.clone() %>,'<%= i.name.clone().unwrap() %>', '<%= i.price.clone().unwrap() %>')"
+                        data-modal-target="default-modal" data-modal-toggle="default-modal"
                         class="flex flex-col  bg-blue-500 text-white h-24 p-4 rounded-md shadow-md">
                         <span><%= i.name.unwrap() %></span>
                         <span>Rp<%= i.price.unwrap() %></span>
@@ -82,17 +85,30 @@
     </div>
 
     <% include!("components/script.html"); %>
-    <script type="module">
+    <script>
+        function choosePacket(id, name, price) {
+            localStorage.setItem("id", id);
+            let d = document
+            d.getElementById("packet-name").innerHTML = name;
+            d.getElementById("packet-price").innerHTML = `Rp${price}`;
+        }
+
         document.getElementById("accept").addEventListener("submit", (e) => {
             e.preventDefault()
             let phone = document.getElementById("phone-field").value;
             phone = parseInt(phone)
-            if (isNaN(phone)){
+            if (isNaN(phone)) {
                 return Swal.fire({
-                    icon:"error",
-                    title:"Format nomor salah"
+                    icon: "error",
+                    title: "Format nomor salah"
                 })
             }
+            let packet_id = localStorage.getItem("id")
+            let data = {
+                phone,
+                packet_id
+            }
+            console.log(data);
             // let modal_dom = document.getElementById("default-modal");
             // let modal = new Modal(modal_dom)
             // modal.hide();

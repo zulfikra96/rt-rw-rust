@@ -4,6 +4,7 @@ use crate::controllers::buy_voucher::ResponseJson;
 use crate::models::GetUserDetail;
 use crate::models::NewUser;
 use crate::DBPool;
+use actix_web::dev::Response;
 use actix_web::web;
 use actix_web::HttpResponse;
 use actix_web::Responder;
@@ -116,9 +117,23 @@ pub async fn register(conn: web::Data<DBPool>, body: web::Json<RequestBody>) -> 
         mikrotik_id: text_to_json["ret"].to_string().replace("\"", ""),
     };
 
-    diesel::insert_into(users::table())
+    let insert_proccess = diesel::insert_into(users::table())
         .values(&params)
-        .execute(&mut connection)
-        .expect("Something went wrong");
-    HttpResponse::Ok().body("Hello world")
+        .execute(&mut connection);
+        
+    match insert_proccess {
+        Ok(_) => {},
+        Err(err) => {
+            println!("Error {}", err);
+            return HttpResponse::BadRequest().json(ResponseJson {
+                message: String::from("Terjadi Kesalahan"),
+                status_code: 400,
+            });
+        }
+    }
+
+    HttpResponse::Ok().json(ResponseJson {
+        message:"Berhasil menambahkan akun".to_string(),
+        status_code: 200
+    })
 }

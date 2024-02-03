@@ -34,7 +34,6 @@ pub async fn get_packet(
     let results = internet_services.select(InternetServices::as_select())
         .load(&mut connection)
         .expect("something went wrong");
-    println!(" result {:?}", results);
     let results: Vec<InternetServiceBinding> = results.into_iter().map(| e|  {
         return InternetServiceBinding {
             id: e.id,

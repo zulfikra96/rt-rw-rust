@@ -1,8 +1,8 @@
-use actix_web::{ web, HttpResponse, Responder };
-use diesel::{r2d2::ConnectionManager, PgConnection, query_dsl::methods::SelectDsl, SelectableHelper, RunQueryDsl, result};
+use actix_web::{ web, HttpResponse };
+use diesel::{r2d2::ConnectionManager, PgConnection, query_dsl::methods::SelectDsl, SelectableHelper, RunQueryDsl};
 use r2d2::Pool;
 use sailfish::TemplateOnce;
-use serde::{Serialize, Deserialize};
+use serde::Serialize;
 use crate::models::InternetServices;
 use bigdecimal::ToPrimitive;
 #[derive(Debug, Serialize)]
@@ -11,10 +11,10 @@ struct ResponseJson {
     data: Vec<InternetServices>
 }
 
-struct InternetServiceBinding {
-    id: i32,
-    name: Option<String>,
-    price: Option<f64>
+pub struct InternetServiceBinding {
+    pub id: i32,
+    pub name: Option<String>,
+    pub price: Option<f64>
 }
 
 type DBPool = Pool<ConnectionManager<PgConnection>>;

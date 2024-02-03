@@ -4,7 +4,6 @@ use crate::models::{GetUserDetail, InternetServices};
 // use crate::models::User;
 use crate::DBPool;
 use actix_web::{post, web, HttpResponse};
-use back_end::schema::users::mikrotik_id;
 use diesel::query_dsl::methods::FilterDsl;
 use diesel::r2d2::ConnectionManager;
 use diesel::sql_types::{Integer, VarChar};
@@ -59,7 +58,6 @@ pub async fn buy_voucher(conn: web::Data<DBPool>, body: web::Json<RequestJson>) 
     use crate::schema::internet_services::dsl::{id as internet_service_id, internet_services};
     use crate::schema::users::dsl::*;
     let mut connection: PooledConnection<ConnectionManager<PgConnection>> = conn.get().expect("something went wring");
-    println!("{}", body.phone);
     let results = users
         .select(GetUserDetail::as_select())
         .filter(phone.eq(body.phone.to_string()))
@@ -94,7 +92,6 @@ pub async fn buy_voucher(conn: web::Data<DBPool>, body: web::Json<RequestJson>) 
     if let Some(some_mikrotik_id) = res[0].mikrotik_id.clone() {
         _mikrotik_id = some_mikrotik_id;
     }
-    println!("Mikrotik id {}", _mikrotik_id);
     let url = std::env::var("MIKROTIK_URL").expect("something went wrong");
     let url_format = format!("{url}/rest/ip/hotspot/user/{_mikrotik_id}");
     let client = Client::new();
@@ -105,7 +102,6 @@ pub async fn buy_voucher(conn: web::Data<DBPool>, body: web::Json<RequestJson>) 
         .await
         .unwrap();
     let res_text: Value = res.json().await.unwrap();
-    println!("{} ", res_text["disabled"]);
     if res_text["disabled"] == String::from("false") {
         return HttpResponse::BadRequest().json(ResponseJson {
             message: String::from("Internet anda masih / telah aktif silahkan konfirmasi langsung kepada admin untuk pembelian voucher internet"),
@@ -146,5 +142,8 @@ pub async fn buy_voucher(conn: web::Data<DBPool>, body: web::Json<RequestJson>) 
     }
     // let json: Value = serde_json::from_str(res_text.as_str()).unwrap();
     // let packet_detail =
-    HttpResponse::Ok().body("success")
+    HttpResponse::Ok().json(ResponseJson {
+        message: "Berhasil membeli paket, silahkan melakukan pembayaran langsung ke rumah mama iting / Adink rahman".to_string(),
+        status_code: 404,
+    })
 }

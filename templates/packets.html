@@ -85,35 +85,58 @@
     </div>
 
     <% include!("components/script.html"); %>
-    <script>
-        function choosePacket(id, name, price) {
-            localStorage.setItem("id", id);
-            let d = document
-            d.getElementById("packet-name").innerHTML = name;
-            d.getElementById("packet-price").innerHTML = `Rp${price}`;
-        }
+                <script>
+                    function choosePacket(id, name, price) {
+                        localStorage.setItem("id", id);
+                        let d = document
+                        d.getElementById("packet-name").innerHTML = name;
+                        d.getElementById("packet-price").innerHTML = `Rp${price}`;
+                    }
 
-        document.getElementById("accept").addEventListener("submit", (e) => {
-            e.preventDefault()
-            let phone = document.getElementById("phone-field").value;
-            phone = parseInt(phone)
-            if (isNaN(phone)) {
-                return Swal.fire({
-                    icon: "error",
-                    title: "Format nomor salah"
-                })
-            }
-            let packet_id = localStorage.getItem("id")
-            let data = {
-                phone,
-                packet_id
-            }
-            console.log(data);
-            // let modal_dom = document.getElementById("default-modal");
-            // let modal = new Modal(modal_dom)
-            // modal.hide();
-        })
-    </script>
+                    document.getElementById("accept").addEventListener("submit", async (e) => {
+                        e.preventDefault()
+                        Swal.showLoading()
+                        let phone = document.getElementById("phone-field").value;
+                        let validate_phone = parseInt(phone)
+                        if (isNaN(validate_phone)) {
+                            return Swal.fire({
+                                icon: "error",
+                                title: "Format nomor salah"
+                            })
+                        }
+                        let packet_id = parseInt(localStorage.getItem("id"))
+                        let data = {
+                            phone,
+                            packet_id
+                        }
+                        try {
+                            let res = await fetch(`/buy-voucher`, {
+                                method: "POST",
+                                headers: {
+                                    "content-type": 'application/json'
+                                },
+                                body: JSON.stringify(data)
+                            })
+                            let response = await res.json();
+                            if (res.status !== 200) {
+                                throw response.message
+                            }
+                            return Swal.fire({
+                                icon: "success",
+                                title: response.message
+                            })
+                        } catch (error) {
+                            console.error(error)
+                            return Swal.fire({
+                                icon: "error",
+                                title: error
+                            })
+                        }
+                        // let modal_dom = document.getElementById("default-modal");
+                        // let modal = new Modal(modal_dom)
+                        // modal.hide();
+                    })
+                </script>
 
 </body>
 

@@ -3,7 +3,7 @@ pub mod controllers;
 pub mod models;
 pub mod schema;
 
-use std::fs;
+// use std::fs;
 
 use self::models::{NewUser, User};
 use actix_cors::Cors;

@@ -1,5 +1,5 @@
-use actix_web::dev::ServiceRequest;
+// use actix_web::dev::ServiceRequest;
 
-pub fn auth_fn(req: ServiceRequest, role: &str) {
+// pub fn auth_fn(req: ServiceRequest, role: &str) {
 
-}
+// }
